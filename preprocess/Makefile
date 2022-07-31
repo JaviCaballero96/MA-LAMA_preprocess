@@ -19,6 +19,9 @@ DEPEND = g++ -MM
 
 vpath %.o obj
 
+all: $(OBJECTS)
+	$(CC) $(LINK_OPTIONS) $(OBJECTS:%=obj/%) -o $(TARGET)
+
 $(TARGET): $(OBJECTS)
 	$(CC) $(LINK_OPTIONS) $(OBJECTS:%=obj/%) -o $(TARGET)
 
