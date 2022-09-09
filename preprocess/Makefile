@@ -10,9 +10,11 @@ PROFILE_TARGET = profile-$(TARGET)
 PROFILE_PARAMETERS =
 
 CC_OPTIONS = -ansi -Wall -O3 -Wno-sign-compare -pedantic -Werror
+## debug, don't optimize
+CC_OPTIONS += -g
 # CC_OPTIONS += -march=pentium3
 PROFILE_OPTIONS = -pg -O3
-LINK_OPTIONS =
+LINK_OPTIONS = -g
 
 CC = g++
 DEPEND = g++ -MM
