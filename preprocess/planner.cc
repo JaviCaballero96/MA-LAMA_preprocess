@@ -41,7 +41,7 @@
 using namespace std;
 
 int main(int argc, const char **argv) {
-  bool metric;
+  string metric;
   vector<Variable *> variables;
   vector<Variable> internal_variables;
   State initial_state;
@@ -55,8 +55,11 @@ int main(int argc, const char **argv) {
       g_do_not_prune_variables = true;
   }
 
+  std::fstream fs;
+  fs.open (argv[1], std::fstream::in);
+
   read_preprocessed_problem_description
-    (cin, metric, internal_variables, variables, initial_state, goals, operators, axioms);
+    (fs, metric, internal_variables, variables, initial_state, goals, operators, axioms);
   //dump_preprocessed_problem_description
   //  (variables, initial_state, goals, operators, axioms);
   

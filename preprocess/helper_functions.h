@@ -42,7 +42,7 @@ class DomainTransitionGraph;
 
 //void read_everything
 void read_preprocessed_problem_description(istream &in,
-					   bool &metric,
+					   string &metric,
 					   vector<Variable> &internal_variables, 
 					   vector<Variable *> &variables, 
 					   State &initial_state,
@@ -61,7 +61,7 @@ void dump_DTGs(const vector<Variable *> &ordering,
 	       vector<DomainTransitionGraph> &transition_graphs );
 void generate_cpp_input(bool causal_graph_acyclic,
 			const vector<Variable *> & ordered_var, 
-			const bool &metric,
+			const string &metric,
 			const State &initial_state,
 			const vector<pair<Variable*, int> > &goals,
 			const vector<Operator> & operators,

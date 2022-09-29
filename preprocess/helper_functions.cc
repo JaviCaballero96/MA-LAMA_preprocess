@@ -46,10 +46,18 @@ void check_magic(istream &in, string magic) {
   }
 }
 
-void read_metric(istream &in, bool& metric) {
+void read_metric(istream &in, string& metric) {
+
+  string aux = "";
+
+  metric = "";
   check_magic(in, "begin_metric");
-  in >> metric;
-  check_magic(in, "end_metric");
+  in >> aux;
+  while(aux != "end_metric")
+  {
+	  metric = metric + "-" + aux;
+	  in >> aux;
+  }
 }
 
 void read_variables(istream &in, vector<Variable> &internal_variables,
@@ -103,7 +111,7 @@ void read_axioms(istream &in, const vector<Variable *> &variables,
 
 
 void read_preprocessed_problem_description(istream &in,
-					   bool &metric,
+		               string &metric,
 					   vector<Variable> &internal_variables, 
 					   vector<Variable *> &variables, 
 					   State &initial_state,
@@ -148,7 +156,7 @@ void dump_DTGs(const vector<Variable *> &ordering,
 
 void generate_cpp_input(bool solveable_in_poly_time,
 			const vector<Variable *> & ordered_vars, 
-			const bool &metric,
+			const string &metric,
 			const State &initial_state,
 			const vector<pair<Variable*, int> > &goals,
 			const vector<Operator> & operators,

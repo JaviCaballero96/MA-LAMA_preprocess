@@ -52,11 +52,25 @@ Operator::Operator(istream &in, const vector<Variable *> &variables) {
       ecs.push_back(EffCond(variables[var], value));
     }
     int varNo, val, newVal;
-    in >> varNo >> val >> newVal;
-    if(eff_conds)
-      pre_post.push_back(PrePost(variables[varNo], ecs, val, newVal));
+    float funcCost;
+    in >> varNo >> val;
+    if(val != -2)
+    {
+        in >> newVal;
+        if(eff_conds)
+          pre_post.push_back(PrePost(variables[varNo], ecs, val, newVal, float(-1)));
+        else
+          pre_post.push_back(PrePost(variables[varNo], val, newVal, float(-1)));
+    }
     else
-      pre_post.push_back(PrePost(variables[varNo], val, newVal));
+    {
+    	in >> funcCost >> varNo >> val;
+        if(eff_conds)
+          pre_post.push_back(PrePost(variables[varNo], ecs, val, newVal, funcCost));
+        else
+          pre_post.push_back(PrePost(variables[varNo], val, newVal, funcCost));
+    }
+
   }
   in >> cost;
   check_magic(in, "end_operator");
