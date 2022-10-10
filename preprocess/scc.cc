@@ -26,13 +26,17 @@
 using namespace std;
 
 vector<vector<int> > SCC::get_result() {
+  // Get node count
   int node_count = graph.size();
+  // initialise vector<int>, first three indexed by vertex number
   dfs_numbers.resize(node_count, -1);
   dfs_minima.resize(node_count, -1);
   stack_indices.resize(node_count, -1);
+  // vector<int> This is indexed by the level of recursion.
   stack.reserve(node_count);
   current_dfs_number = 0;
 
+  // For each node
   for(int i = 0; i < node_count; i++)
     if(dfs_numbers[i] == -1)
       dfs(i);
@@ -42,31 +46,49 @@ vector<vector<int> > SCC::get_result() {
 }
 
 void SCC::dfs(int vertex) {
+  // current_dfs_number: global variable that indicates current depth
   int vertex_dfs_number = current_dfs_number++;
   dfs_numbers[vertex] = dfs_minima[vertex] = vertex_dfs_number;
+  // stack is an stack of vertex that leads to this vertex
   stack_indices[vertex] = stack.size();
   stack.push_back(vertex);
 
+  // For each successor of the vertex
   const vector<int> &successors = graph[vertex];
   for(int i = 0; i < successors.size(); i++) {
+	 // get index and dfs_number of the successor
     int succ = successors[i];
     int succ_dfs_number = dfs_numbers[succ];
+    // If the succ has not been analyzed yet
     if(succ_dfs_number == -1) {
+      // Analyze
       dfs(succ);
+      // The minimum dfs is the min value between the current min and the dfs of the successor
       dfs_minima[vertex] = min(dfs_minima[vertex], dfs_minima[succ]);
-    } else if(succ_dfs_number < vertex_dfs_number && stack_indices[succ] != -1) {
+    }
+    // If the succ has been analyzed, the depth of the successor is minor than current and
+    // the successor can be found in the satack of the current vertex
+    else if(succ_dfs_number < vertex_dfs_number && stack_indices[succ] != -1) {
+      // Set the minimum dfs
       dfs_minima[vertex] = min(dfs_minima[vertex], succ_dfs_number);
     }
   }
 
+  // If the minimum dfs for the current vertex is the current one after analyzing all successors
   if(dfs_minima[vertex] == vertex_dfs_number) {
+	 // Get stack index
     int stack_index = stack_indices[vertex];
+     //Create scc: a stack of strongly connected components following the minimum stack
     vector<int> scc;
     for(int i = stack_index; i < stack.size(); i++) {
+      // Add the component
       scc.push_back(stack[i]);
+      // Remove the index and set to default
       stack_indices[stack[i]] = -1;
     }
+    // Erase the stack
     stack.erase(stack.begin() + stack_index, stack.end());
+    // Add the scc to the list of sccs
     sccs.push_back(scc);
   }
 }

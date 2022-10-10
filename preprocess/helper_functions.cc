@@ -154,6 +154,15 @@ void dump_DTGs(const vector<Variable *> &ordering,
   }
 }
 
+std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) {
+    size_t start_pos = 0;
+    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+    }
+    return str;
+}
+
 void generate_cpp_input(bool solveable_in_poly_time,
 			const vector<Variable *> & ordered_vars, 
 			const string &metric,
@@ -165,10 +174,15 @@ void generate_cpp_input(bool solveable_in_poly_time,
 			const vector<DomainTransitionGraph> transition_graphs,
 			const CausalGraph &cg) {
   ofstream outfile;
-  outfile.open("output",ios::out);
+  string metric_str;
+  outfile.open("/home/javier/Desktop/planners/outPreprocess/output_prepro",ios::out);
   outfile << solveable_in_poly_time << endl; // 1 if true, else 0
   outfile << "begin_metric" << endl;
-  outfile << metric << endl;
+  metric_str = metric.substr(metric.find("(") + 1, metric.length());
+  metric_str = metric_str.substr(0, metric_str.find(")"));
+  metric_str = ReplaceAll(metric_str, "-", " ");
+  metric_str = metric_str + "end";
+  outfile << metric_str << endl;
   outfile << "end_metric" << endl;
   int var_count = ordered_vars.size();
   outfile << "begin_variables" << endl;

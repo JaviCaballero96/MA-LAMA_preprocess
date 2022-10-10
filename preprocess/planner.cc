@@ -82,7 +82,7 @@ int main(int argc, const char **argv) {
   cout << "solveable in poly time " << solveable_in_poly_time << endl;
   cout << "Building successor generator..." << endl;
   SuccessorGenerator successor_generator(ordering, operators);
-  //successor_generator.dump();
+  // successor_generator.dump();
 
   cout << "Writing output..." << endl;
   generate_cpp_input(solveable_in_poly_time, ordering, metric, initial_state, 

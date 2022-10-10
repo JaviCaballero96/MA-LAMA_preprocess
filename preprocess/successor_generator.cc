@@ -124,11 +124,11 @@ void GeneratorSwitch::generate_cpp_input(ofstream &outfile) const {
       op_iter != immediate_ops_indices.end(); ++op_iter)
     outfile << *op_iter << endl;
   for(int i = 0; i < switch_var->get_range(); i++) {
-    //cout << "case "<<switch_var->get_name()<<" (Level " <<switch_var->get_level() <<
-    //  ") has value " << i << ":" << endl;
+    cout << "case "<<switch_var->get_name()<<" (Level " <<switch_var->get_level() <<
+      ") has value " << i << ":" << endl;
     generator_for_value[i]->generate_cpp_input(outfile);
   }
-  //cout << "always:" << endl; 
+  cout << "always:" << endl;
   default_generator->generate_cpp_input(outfile);
 }
 
@@ -162,19 +162,25 @@ SuccessorGenerator::SuccessorGenerator(const vector<Variable *> &variables,
   // We need the iterators to conditions to be stable:
   conditions.reserve(operators.size());
   list<int> all_operator_indices;
+  // For each operator
   for(int i = 0; i < operators.size(); i++) {
     const Operator *op = &operators[i];
     Condition cond;
+    // For each prevail in the operator
     for(int j = 0; j < op->get_prevail().size(); j++) {
       Operator::Prevail prev = op->get_prevail()[j];
       cond.push_back(make_pair(prev.var, prev.prev));
     }
+    // For each effect, get also the pre to construct conditions
     for(int j = 0; j < op->get_pre_post().size(); j++) {
       Operator::PrePost pre_post = op->get_pre_post()[j];
-      if(pre_post.pre != -1)
+      if((pre_post.pre != -1) && ((pre_post.pre != -2) && (pre_post.pre != -3) && (pre_post.pre != -4)))
 	cond.push_back(make_pair(pre_post.var, pre_post.pre));
     }
     sort(cond.begin(), cond.end());
+    // We finally get several vectors: operator indices, conditions and
+    // vector of pointers (iterator) to each condition in the
+    // conditions vector indexed by operator index
     all_operator_indices.push_back(i);
     conditions.push_back(cond);
     next_condition_by_op.push_back(conditions.back().begin());
@@ -191,14 +197,17 @@ GeneratorBase *SuccessorGenerator::construct_recursive(int switch_var_no,
   if(op_indices.empty())
     return new GeneratorEmpty;
 
+  // Infinite loop
   while(true) {
     // Test if no further switch is necessary (or possible).
     if(switch_var_no == varOrder.size())
       return new GeneratorLeaf(op_indices);
 
+    // Get a pointer to the sorted Variables and its possible values size
     Variable *switch_var = varOrder[switch_var_no];
     int number_of_children = switch_var->get_range();
 
+    // Create a list for each possible value of the variable
     vector<list<int> > ops_for_val_indices(number_of_children);
     list<int> default_ops_indices;
     list<int> applicable_ops_indices;
@@ -206,38 +215,59 @@ GeneratorBase *SuccessorGenerator::construct_recursive(int switch_var_no,
     bool all_ops_are_immediate = true;
     bool var_is_interesting = false;
     
+    // While there are operators in op_indices
     while(!op_indices.empty()) {
+      // Get the top one
       int op_index = op_indices.front();
       op_indices.pop_front();
+      // Assert that the operator is a valid one (>0 and <max)
       assert(op_index >= 0 && op_index < next_condition_by_op.size());
+      // Get condition iterator
       Condition::const_iterator &cond_iter = next_condition_by_op[op_index];
+      // Assert that the size of the stored conditions is valid
       assert(cond_iter - conditions[op_index].begin() >= 0);
       assert(cond_iter - conditions[op_index].begin() <= conditions[op_index].size());
+      // If the extract4ed condition is the last
       if(cond_iter == conditions[op_index].end()) {
-	var_is_interesting = true;
-	applicable_ops_indices.push_back(op_index);
+    	// Make the var interesting and add the operator to the applicable list
+    	  var_is_interesting = true;
+    	  applicable_ops_indices.push_back(op_index);
       } else {
-	all_ops_are_immediate = false;
-	Variable *var = cond_iter->first;
-	int val = cond_iter->second;
-	if(var == switch_var) {
-	  var_is_interesting = true;
-	  ++cond_iter;
-	  ops_for_val_indices[val].push_back(op_index);
-	} else {
-	  default_ops_indices.push_back(op_index);
-	}
+    	  // If there exists a condition, then not immediate,
+    	  all_ops_are_immediate = false;
+    	  // Get variable that presents a condition
+    	  Variable *var = cond_iter->first;
+    	  // Get index
+    	  int val = cond_iter->second;
+    	  // If the variable is the switch_var
+    	  if(var == switch_var) {
+    		  // Var is interesting, get next condition
+    		  var_is_interesting = true;
+    		  ++cond_iter;
+    		  // Store in the operator in the values indexed list
+    		  ops_for_val_indices[val].push_back(op_index);
+    	  } else {
+    		  // If the var is not the switch_var, add the operator to the default list
+    		  default_ops_indices.push_back(op_index);
+    	  }
       }
     }
     
+    // If there aren't any conditions
     if(all_ops_are_immediate) {
+    	// Return the generator with the applicable indices
       return new GeneratorLeaf(applicable_ops_indices);
     } else if(var_is_interesting) {
+        // Else if the var is interesting --> appears in the conditioins of a operator
       vector<GeneratorBase *> gen_for_val;
+      // Iterate over the possible values of the variable
       for(int j = 0; j < number_of_children; j++) {
-	gen_for_val.push_back(construct_recursive(switch_var_no + 1,
+    	  // Perform the same study for the next switch_var and the operators of each var value
+    	  // Add the returned GeneratorBase to gen_for_val, one for each child
+    	  gen_for_val.push_back(construct_recursive(switch_var_no + 1,
 						  ops_for_val_indices[j]));
       }
+      // Perform the same study over the next variable for all default ops (affect a var)
       GeneratorBase *default_sg = construct_recursive(switch_var_no + 1,
 						      default_ops_indices);
       return new GeneratorSwitch(switch_var, applicable_ops_indices, gen_for_val, default_sg);

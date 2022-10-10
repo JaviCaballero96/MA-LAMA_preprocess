@@ -55,17 +55,21 @@ void DomainTransitionGraph::addTransition(int from, int to, const Operator &op,
   for(int i = 0; i < prevail.size(); i++)
     if(true) // [cycles]
     // if(prevail[i].var->get_level() < level) // [no cycles]
+      // The first condition is the var and the prev state
       cond.push_back(make_pair(prevail[i].var, prevail[i].prev));
   for(int i = 0; i < pre_post.size(); i++)
-    if(pre_post[i].var->get_level() != level && pre_post[i].pre != -1) // [cycles]
+    if(pre_post[i].var->get_level() != level && pre_post[i].pre != -1 &&
+    		((pre_post[i].pre != -2) && (pre_post[i].pre != -3) && (pre_post[i].pre != -4))) // [cycles]
     // if(pre_post[i].var->get_level() < level && pre_post[i].pre != -1) //[no cycles]
+      // The other conditions are other prev states in the operator
       cond.push_back(make_pair(pre_post[i].var, pre_post[i].pre));
     else
       if(pre_post[i].var->get_level() == level && pre_post[i].is_conditional_effect)
 	for(int j = 0; j < pre_post[i].effect_conds.size(); j++)
 	  cond.push_back(make_pair(pre_post[i].effect_conds[j].var,
 				   pre_post[i].effect_conds[j].cond));
-	
+
+  // The transitioin is added to the vertice "from" in this transition graph
   vertices[from].push_back(trans);
 }
 void DomainTransitionGraph::addAxTransition(int from, int to, const Axiom &ax,
@@ -158,19 +162,27 @@ void build_DTGs(const vector<Variable *> &var_order,
 		const vector<Operator> &operators,
 		const vector<Axiom> &axioms,
 		vector<DomainTransitionGraph> &transition_graphs) {
+  // For each var a transition graph is created
   for(int i = 0; i < var_order.size(); i++) {
     transition_graphs.push_back(DomainTransitionGraph(*var_order[i]));
   }
 
+  // For each operator
   for(int i = 0; i < operators.size(); i++) {
     const Operator &op = operators[i];
+    // For each effect
     const vector<Operator::PrePost> &pre_post = op.get_pre_post();
     for(int j = 0; j < pre_post.size(); j++) {
+    	//If the varable has been explored
       const Variable *var = pre_post[j].var;
       int var_level = var->get_level();
-      if(var_level != -1) {
+      if((var_level != -1) && (pre_post[j].pre != -2 and
+    		  pre_post[j].pre != -3 and pre_post[j].pre != -4)) {
+    // Get pre and post
 	int pre = pre_post[j].pre;
 	int post = pre_post[j].post;
+	// If pre is not a non state
+	// Transition graphs are indexed by variable but ordered by importance
 	if(pre != -1) {
 	  transition_graphs[var_level].addTransition(pre, post, op, i);
 	} else {

@@ -40,6 +40,8 @@ class Operator;
 class Axiom;
 class DomainTransitionGraph;
 
+std::string ReplaceAll(std::string str, const std::string& from, const std::string& to);
+
 //void read_everything
 void read_preprocessed_problem_description(istream &in,
 					   string &metric,
