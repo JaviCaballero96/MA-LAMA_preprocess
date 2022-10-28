@@ -172,10 +172,17 @@ void generate_cpp_input(bool solveable_in_poly_time,
 			const vector<Axiom> &axioms,
 			const SuccessorGenerator &sg,
 			const vector<DomainTransitionGraph> transition_graphs,
-			const CausalGraph &cg) {
+			const CausalGraph &cg,
+			string name) {
   ofstream outfile;
   string metric_str;
-  outfile.open("/home/javier/Desktop/planners/outPreprocess/output_prepro",ios::out);
+  string f_name = "/home/javier/Desktop/planners/outPreprocess/output_prepro";
+  f_name = f_name + name;
+  outfile.open(f_name.c_str(),ios::out);
+  if(name == "")
+	  outfile << "gen" << endl;
+  else
+	  outfile << name << endl;
   outfile << solveable_in_poly_time << endl; // 1 if true, else 0
   outfile << "begin_metric" << endl;
   metric_str = metric.substr(metric.find("(") + 1, metric.length());

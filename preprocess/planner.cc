@@ -49,6 +49,7 @@ int main(int argc, const char **argv) {
   vector<Operator> operators;
   vector<Axiom> axioms;
   vector<DomainTransitionGraph> transition_graphs;
+  string name = "";
 
   if(argc != 1) {
       cout << "*** do not perform relevance analysis ***" << endl;
@@ -57,6 +58,10 @@ int main(int argc, const char **argv) {
 
   std::fstream fs;
   fs.open (argv[1], std::fstream::in);
+
+  fs >> name;
+  if(name == "gen")
+	  name = "";
 
   read_preprocessed_problem_description
     (fs, metric, internal_variables, variables, initial_state, goals, operators, axioms);
@@ -87,6 +92,6 @@ int main(int argc, const char **argv) {
   cout << "Writing output..." << endl;
   generate_cpp_input(solveable_in_poly_time, ordering, metric, initial_state, 
 		     goals, operators, axioms, successor_generator, 
-		     transition_graphs, causal_graph);
+		     transition_graphs, causal_graph, name);
   cout << "done" << endl << endl;
 }
