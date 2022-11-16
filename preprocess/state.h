@@ -32,11 +32,13 @@ class Variable;
 
 class State {
   map<Variable *, int> values;
-public:
+  map<Variable *, float> numeric_values;
+  public:
   State() {}
   State(istream &in, const vector<Variable *> &variables);
 
   int operator[](Variable *var) const;
+  float get_numeric_value(Variable *var) const;
   void dump() const;
 };
 

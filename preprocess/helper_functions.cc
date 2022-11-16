@@ -199,8 +199,16 @@ void generate_cpp_input(bool solveable_in_poly_time,
       ordered_vars[i]->get_range() << " " << ordered_vars[i]->get_layer()<< endl;
   outfile << "end_variables" << endl;
   outfile << "begin_state" << endl;
-  for(int i = 0; i < var_count; i++)
-    outfile << initial_state[ordered_vars[i]] << endl; // for axioms default value
+  for(int i = 0; i < var_count; i++){
+    outfile << initial_state[ordered_vars[i]];// for axioms default value
+  	if (initial_state[ordered_vars[i]] == -1)
+  	{
+  		outfile << " " << initial_state.get_numeric_value(ordered_vars[i]) << endl;
+  	}else
+  	{
+  		outfile << endl;
+  	}
+  }
   outfile << "end_state" << endl;
 
   vector<int> ordered_goal_values;

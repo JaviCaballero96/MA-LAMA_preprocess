@@ -22,6 +22,7 @@
 
 #include "state.h"
 #include "helper_functions.h"
+#include "float.h"
 
 class Variable;
 
@@ -29,14 +30,28 @@ State::State(istream &in, const vector<Variable *> &variables) {
   check_magic(in, "begin_state");
   for(int i = 0; i < variables.size(); i++) {
     int value;
+    float num_value;
     in >> value; //for axioms, this is default value
-    values[variables[i]] = value;
+
+    if(value == -1)
+    {
+        values[variables[i]] = value;
+    	in >> num_value;
+    	numeric_values[variables[i]] = num_value;
+    }else{
+    	numeric_values[variables[i]] = FLT_MAX;
+    	values[variables[i]] = value;
+    }
 }
   check_magic(in, "end_state");
 }
 
 int State::operator[](Variable *var) const {
   return values.find(var)->second;
+}
+
+float State::get_numeric_value(Variable *var) const {
+	return numeric_values.find(var)->second;
 }
 
 void State::dump() const {
