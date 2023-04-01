@@ -74,6 +74,21 @@ void read_variables(istream &in, vector<Variable> &internal_variables,
   check_magic(in, "end_variables");
 }
 
+void read_shared(istream &in, vector<Variable *> &shared_vars, vector<int> &shared_vars_number,
+		const vector<Variable *> &variables) {
+  check_magic(in, "begin_shared");
+  int count;
+  in >> count;
+  shared_vars.reserve(count);
+  for(int i = 0; i < count; i++) {
+	  int var, var2;
+	  in >> var >> var2;
+	  shared_vars.push_back(variables[var2]);
+	  shared_vars_number.push_back(var2);
+  }
+  check_magic(in, "end_shared");
+}
+
 void read_goal(istream &in, const vector<Variable *> &variables,  
 	       vector<pair<Variable*, int> > &goals) { 
   check_magic(in, "begin_goal");
@@ -117,10 +132,13 @@ void read_preprocessed_problem_description(istream &in,
 					   State &initial_state,
 					   vector<pair<Variable*, int> > &goals,
 					   vector<Operator> &operators,
-					   vector<Axiom> &axioms) {
+					   vector<Axiom> &axioms,
+					   vector<Variable *> &shared_vars,
+					   vector<int> &shared_vars_number) {
   read_metric(in, metric); 
   read_variables(in, internal_variables, variables);
   initial_state = State(in, variables);
+  read_shared(in, shared_vars, shared_vars_number, variables);
   read_goal(in, variables, goals);
   read_operators(in, variables, operators);
   read_axioms(in, variables, axioms);
@@ -173,7 +191,9 @@ void generate_cpp_input(bool solveable_in_poly_time,
 			const SuccessorGenerator &sg,
 			const vector<DomainTransitionGraph> transition_graphs,
 			const CausalGraph &cg,
-			string name) {
+			string name,
+			vector<Variable *> &shared_vars,
+			vector<int> &shared_vars_number) {
   ofstream outfile;
   string metric_str;
   string f_name = "/home/javier/Desktop/planners/outPreprocess/output_prepro";
@@ -196,7 +216,7 @@ void generate_cpp_input(bool solveable_in_poly_time,
   outfile << var_count << endl;
   for(int i = 0; i < var_count; i++) 
     outfile << ordered_vars[i]->get_name()  << " " << 
-      ordered_vars[i]->get_range() << " " << ordered_vars[i]->get_layer()<< endl;
+      ordered_vars[i]->get_range() << " " << ordered_vars[i]->get_layer() << " " << ordered_vars[i]->get_isTotalTime() << endl;
   outfile << "end_variables" << endl;
   outfile << "begin_state" << endl;
   for(int i = 0; i < var_count; i++){
@@ -210,6 +230,21 @@ void generate_cpp_input(bool solveable_in_poly_time,
   	}
   }
   outfile << "end_state" << endl;
+
+  int shared_count = shared_vars.size();
+  outfile << "begin_shared" << endl;
+  outfile << shared_count << endl;
+  vector<string> ordered_shared_values;
+  ordered_shared_values.resize(var_count, "-1");
+  for(int i = 0; i < shared_vars_number.size(); i++) {
+    int var_index = shared_vars[i]->get_level();
+    ordered_shared_values[var_index] = shared_vars[i]->get_name();
+  }
+  for(int i = 0; i < var_count; i++)
+    if(ordered_shared_values[i] != "-1")
+      outfile << ordered_shared_values[i] << " " <<  i  << " " << endl;
+  outfile << "end_shared" << endl;
+
 
   vector<int> ordered_goal_values;
   ordered_goal_values.resize(var_count, -1);

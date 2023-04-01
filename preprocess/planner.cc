@@ -50,6 +50,8 @@ int main(int argc, const char **argv) {
   vector<Axiom> axioms;
   vector<DomainTransitionGraph> transition_graphs;
   string name = "";
+  vector<Variable *> shared_vars;
+  vector<int> shared_vars_number;
 
   if(argc != 1) {
       cout << "*** do not perform relevance analysis ***" << endl;
@@ -64,7 +66,7 @@ int main(int argc, const char **argv) {
 	  name = "";
 
   read_preprocessed_problem_description
-    (fs, metric, internal_variables, variables, initial_state, goals, operators, axioms);
+    (fs, metric, internal_variables, variables, initial_state, goals, operators, axioms, shared_vars, shared_vars_number);
   //dump_preprocessed_problem_description
   //  (variables, initial_state, goals, operators, axioms);
   
@@ -92,6 +94,6 @@ int main(int argc, const char **argv) {
   cout << "Writing output..." << endl;
   generate_cpp_input(solveable_in_poly_time, ordering, metric, initial_state, 
 		     goals, operators, axioms, successor_generator, 
-		     transition_graphs, causal_graph, name);
+		     transition_graphs, causal_graph, name, shared_vars, shared_vars_number);
   cout << "done" << endl << endl;
 }

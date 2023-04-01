@@ -26,7 +26,7 @@
 using namespace std;
 
 Variable::Variable(istream &in) {
-  in >> name >> range >> layer;
+  in >> name >> range >> layer >> isTotalTime;
   level = -1;
   necessary = false;
 }
@@ -55,6 +55,14 @@ string Variable::get_name() const {
 
 bool Variable::is_necessary() const {
   return necessary;
+}
+
+bool Variable::get_isTotalTime() const{
+	return isTotalTime;
+}
+
+void Variable::set_isTotalTime(bool theisTotalTime) {
+	isTotalTime = theisTotalTime;
 }
 
 void Variable::dump() const {
