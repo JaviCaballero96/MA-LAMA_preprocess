@@ -174,7 +174,7 @@ SuccessorGenerator::SuccessorGenerator(const vector<Variable *> &variables,
     // For each effect, get also the pre to construct conditions
     for(int j = 0; j < op->get_pre_post().size(); j++) {
       Operator::PrePost pre_post = op->get_pre_post()[j];
-      if((pre_post.pre != -1) && ((pre_post.pre != -2) && (pre_post.pre != -3) && (pre_post.pre != -4)))
+      if((pre_post.pre != -1) && ((pre_post.pre != -2) && (pre_post.pre != -3) && (pre_post.pre != -4) && (pre_post.pre != -5) && (pre_post.pre != -6)))
 	cond.push_back(make_pair(pre_post.var, pre_post.pre));
     }
     sort(cond.begin(), cond.end());

@@ -59,7 +59,7 @@ void DomainTransitionGraph::addTransition(int from, int to, const Operator &op,
       cond.push_back(make_pair(prevail[i].var, prevail[i].prev));
   for(int i = 0; i < pre_post.size(); i++)
     if(pre_post[i].var->get_level() != level && pre_post[i].pre != -1 &&
-    		((pre_post[i].pre != -2) && (pre_post[i].pre != -3) && (pre_post[i].pre != -4))) // [cycles]
+    		((pre_post[i].pre != -2) && (pre_post[i].pre != -3) && (pre_post[i].pre != -4) && (pre_post[i].pre != -5) && (pre_post[i].pre != -6))) // [cycles]
     // if(pre_post[i].var->get_level() < level && pre_post[i].pre != -1) //[no cycles]
       // The other conditions are other prev states in the operator
       cond.push_back(make_pair(pre_post[i].var, pre_post[i].pre));
@@ -177,7 +177,7 @@ void build_DTGs(const vector<Variable *> &var_order,
       const Variable *var = pre_post[j].var;
       int var_level = var->get_level();
       if((var_level != -1) && (pre_post[j].pre != -2 and
-    		  pre_post[j].pre != -3 and pre_post[j].pre != -4)) {
+    		  pre_post[j].pre != -3 and pre_post[j].pre != -4 and pre_post[j].pre != -5 and pre_post[j].pre != -6)) {
     // Get pre and post
 	int pre = pre_post[j].pre;
 	int post = pre_post[j].post;

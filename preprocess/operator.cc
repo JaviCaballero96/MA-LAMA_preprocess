@@ -54,7 +54,7 @@ Operator::Operator(istream &in, const vector<Variable *> &variables) {
     int varNo, val, newVal;
     float funcCost;
     in >> varNo >> val;
-    if(val != -2 && (val != -3) && (val != -4))
+    if(val != -2 && (val != -3) && (val != -4) && (val != -5) && (val != -6))
     {
         in >> newVal;
         if(eff_conds)
@@ -145,7 +145,7 @@ void Operator::generate_cpp_input(ofstream &outfile) const {
       outfile << "0" << endl;
     }
 
-    if((pre_post[i].pre != -2) && (pre_post[i].pre != -3) && (pre_post[i].pre != -4))
+    if((pre_post[i].pre != -2) && (pre_post[i].pre != -3) && (pre_post[i].pre != -4) && (pre_post[i].pre != -5) && (pre_post[i].pre != -6))
     	outfile << pre_post[i].var->get_level() << " " << pre_post[i].pre << " "
 	    	<< pre_post[i].post << endl;
     else
