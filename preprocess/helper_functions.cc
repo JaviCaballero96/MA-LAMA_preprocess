@@ -196,7 +196,7 @@ void generate_cpp_input(bool solveable_in_poly_time,
 			vector<int> &shared_vars_number) {
   ofstream outfile;
   string metric_str;
-  string f_name = "/home/javier/Desktop/planners/outPreprocess/output_prepro";
+  string f_name = "output_prepro";
   f_name = f_name + name;
   outfile.open(f_name.c_str(),ios::out);
   if(name == "")
