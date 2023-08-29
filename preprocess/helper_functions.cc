@@ -53,11 +53,13 @@ void read_metric(istream &in, string& metric) {
   metric = "";
   check_magic(in, "begin_metric");
   in >> aux;
-  while(aux != "end_metric")
+  while(aux != "end")
   {
 	  metric = metric + "-" + aux;
 	  in >> aux;
   }
+
+  check_magic(in, "end_metric");
 }
 
 void read_variables(istream &in, vector<Variable> &internal_variables,
