@@ -48,12 +48,30 @@ public:
     Variable *var;
     int pre, post;
     float f_cost;
+    bool have_runtime_cost_effect;
+    string runtime_cost_effect;
     bool is_conditional_effect;
     vector<EffCond> effect_conds;
     PrePost(Variable *v, int pr, int po, float f_c) : var(v), pre(pr), post(po), f_cost(f_c){
-      is_conditional_effect = false; }
+      is_conditional_effect = false;
+      have_runtime_cost_effect = false;
+      runtime_cost_effect = "";}
+
+    PrePost(Variable *v, int pr, int po, float f_c, std::string& run_cost) : var(v), pre(pr), post(po),
+    		f_cost(f_c), runtime_cost_effect(run_cost){
+      is_conditional_effect = false;
+      have_runtime_cost_effect = true;}
+
     PrePost(Variable *v, vector<EffCond> ecs, int pr, int po, float f_c) : var(v), pre(pr),
-	 post(po), f_cost(f_c), effect_conds(ecs) { is_conditional_effect = true; }
+	 post(po), f_cost(f_c), effect_conds(ecs) {
+    	is_conditional_effect = true;
+    	have_runtime_cost_effect = false;
+    	runtime_cost_effect = "";}
+
+    PrePost(Variable *v, vector<EffCond> ecs, int pr, int po, float f_c, std::string& run_cost) : var(v), pre(pr),
+	 post(po), f_cost(f_c), runtime_cost_effect(run_cost), effect_conds(ecs){
+    	is_conditional_effect = true;
+    	have_runtime_cost_effect = true;}
   };
   
 private:
@@ -61,6 +79,8 @@ private:
   vector<Prevail> prevail;      // var, val
   vector<PrePost> pre_post; // var, old-val, new-val
   float cost;
+  bool have_runtime_cost;
+  string runtime_cost;
 public:
   Operator(istream &in, const vector<Variable *> &variables);
 

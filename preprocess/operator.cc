@@ -28,6 +28,7 @@
 #include <cassert>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 using namespace std;
 
 Operator::Operator(istream &in, const vector<Variable *> &variables) {
@@ -52,7 +53,8 @@ Operator::Operator(istream &in, const vector<Variable *> &variables) {
       ecs.push_back(EffCond(variables[var], value));
     }
     int varNo, val, newVal;
-    float funcCost;
+    string funcCost;
+    float f_funcCost = 0;
     in >> varNo >> val;
     if(val != -2 && (val != -3) && (val != -4) && (val != -5) && (val != -6))
     {
@@ -65,14 +67,33 @@ Operator::Operator(istream &in, const vector<Variable *> &variables) {
     else
     {
     	in >> funcCost >> varNo >> newVal;
-        if(eff_conds)
-          pre_post.push_back(PrePost(variables[varNo], ecs, val, newVal, funcCost));
-        else
-          pre_post.push_back(PrePost(variables[varNo], val, newVal, funcCost));
+    	if (funcCost.find('(') == std::string::npos)
+    	{
+            istringstream buffer(funcCost);
+            buffer >> f_funcCost;
+            if(eff_conds)
+              pre_post.push_back(PrePost(variables[varNo], ecs, val, newVal, f_funcCost));
+            else
+              pre_post.push_back(PrePost(variables[varNo], val, newVal, f_funcCost));
+    	} else{
+            if(eff_conds)
+              pre_post.push_back(PrePost(variables[varNo], ecs, val, newVal, float(0),funcCost));
+            else
+              pre_post.push_back(PrePost(variables[varNo], val, newVal, float(0), funcCost));
+    	}
     }
 
   }
   in >> cost;
+  string s_aux = "";
+  in >> s_aux;
+  if(s_aux == "runtime"){
+	  have_runtime_cost = true;
+	  in >> runtime_cost;
+  } else{
+	  have_runtime_cost = false;
+	  in >> s_aux;
+  }
   check_magic(in, "end_operator");
 }
 
@@ -149,9 +170,23 @@ void Operator::generate_cpp_input(ofstream &outfile) const {
     	outfile << pre_post[i].var->get_level() << " " << pre_post[i].pre << " "
 	    	<< pre_post[i].post << endl;
     else
-    	outfile << pre_post[i].var->get_level() << " " << pre_post[i].pre << " "
+    {
+    	if (pre_post[i].have_runtime_cost_effect)
+    		outfile << pre_post[i].var->get_level() << " " << pre_post[i].pre << " "
+    		    	<< pre_post[i].post << " " << pre_post[i].runtime_cost_effect << endl;
+    	else
+    		outfile << pre_post[i].var->get_level() << " " << pre_post[i].pre << " "
     		    	<< pre_post[i].post << " " << pre_post[i].f_cost << endl;
+    }
   }
   outfile << cost << endl;
+  if(have_runtime_cost)
+  {
+	  outfile << "runtime" << endl;
+	  outfile << runtime_cost << endl;
+  }else{
+	  outfile << "no-run" << endl;
+	  outfile << "-" << endl;
+  }
   outfile << "end_operator" << endl;
 }
