@@ -75,7 +75,8 @@ void generate_cpp_input(bool causal_graph_acyclic,
 			const CausalGraph &cg,
 			string name,
 			vector<Variable *> &shared_vars,
-			vector<int> &shared_vars_number);
+			vector<int> &shared_vars_number,
+			vector<Variable *> variables);
 void check_magic(istream &in, string magic);
 
 #endif

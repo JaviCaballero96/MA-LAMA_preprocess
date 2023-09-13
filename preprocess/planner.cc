@@ -94,6 +94,7 @@ int main(int argc, const char **argv) {
   cout << "Writing output..." << endl;
   generate_cpp_input(solveable_in_poly_time, ordering, metric, initial_state, 
 		     goals, operators, axioms, successor_generator, 
-		     transition_graphs, causal_graph, name, shared_vars, shared_vars_number);
+		     transition_graphs, causal_graph, name, shared_vars, shared_vars_number,
+			 variables);
   cout << "done" << endl << endl;
 }

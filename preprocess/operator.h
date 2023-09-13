@@ -88,7 +88,7 @@ public:
   bool is_redundant() const;
 
   void dump() const;
-  void generate_cpp_input(ofstream &outfile) const;
+  void generate_cpp_input(ofstream &outfile, vector<Variable *> variables) const;
   string get_name() const {return name;}
   const vector<Prevail> &get_prevail() const {return prevail;}
   const vector<PrePost> &get_pre_post() const {return pre_post;}

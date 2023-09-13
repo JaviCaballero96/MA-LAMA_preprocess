@@ -143,7 +143,7 @@ void strip_operators(vector<Operator> &operators) {
   cout << operators.size() << " of " << old_count << " operators necessary." << endl;
 }
 
-void Operator::generate_cpp_input(ofstream &outfile) const {
+void Operator::generate_cpp_input(ofstream &outfile, vector<Variable *> variables) const {
   outfile << "begin_operator" << endl;
   outfile << name << endl;
 
@@ -171,9 +171,36 @@ void Operator::generate_cpp_input(ofstream &outfile) const {
 	    	<< pre_post[i].post << endl;
     else
     {
-    	if (pre_post[i].have_runtime_cost_effect)
+    	if (pre_post[i].have_runtime_cost_effect){
+
+    		string s_effect = pre_post[i].runtime_cost_effect;
+    		string s_eff_aux = s_effect;
+    		while(s_effect.find("_") != string::npos){
+    			string var = "";
+    			int i_var;
+    			int var_level = 0;
+    			s_eff_aux = s_eff_aux.substr(s_eff_aux.find("_") + 1, s_eff_aux.length() - 1);
+    			var = s_eff_aux.substr(0, s_eff_aux.find("_"));
+    			s_eff_aux = s_eff_aux.substr(s_eff_aux.find("_") + 1, s_eff_aux.length() - 1);
+    			stringstream strm(var);
+    			strm >> i_var;
+    			strm.str(std::string());
+    			var_level = variables[i_var]->get_level();
+    			std::ostringstream strm_var;
+    			strm_var << var_level;
+
+    			string from = "_" + var + "_";
+    			string to = ":" + strm_var.str() + ":";
+    		    size_t start_pos = 0;
+    		    while((start_pos = s_effect.find(from, start_pos)) != std::string::npos) {
+    		    	s_effect.replace(start_pos, from.length(), to);
+    		        start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+    		    }
+    		}
+
     		outfile << pre_post[i].var->get_level() << " " << pre_post[i].pre << " "
-    		    	<< pre_post[i].post << " " << pre_post[i].runtime_cost_effect << endl;
+    		    	<< pre_post[i].post << " " << s_effect << endl;
+    	}
     	else
     		outfile << pre_post[i].var->get_level() << " " << pre_post[i].pre << " "
     		    	<< pre_post[i].post << " " << pre_post[i].f_cost << endl;
@@ -183,7 +210,30 @@ void Operator::generate_cpp_input(ofstream &outfile) const {
   if(have_runtime_cost)
   {
 	  outfile << "runtime" << endl;
-	  outfile << runtime_cost << endl;
+	  string s_effect = runtime_cost;
+	  string s_eff_aux = s_effect;
+	  while(s_effect.find("_") != string::npos){
+	  		string var = "";
+	   		int i_var;
+	   		int var_level = 0;
+	  		s_eff_aux = s_eff_aux.substr(s_eff_aux.find("_") + 1, s_eff_aux.length() - 1);
+	   		var = s_eff_aux.substr(0, s_eff_aux.find("_"));
+	   		s_eff_aux = s_eff_aux.substr(s_eff_aux.find("_") + 1, s_eff_aux.length() - 1);
+	   		stringstream strm(var);
+	   		strm >> i_var;
+	   		strm.str(std::string());
+	   		var_level = variables[i_var]->get_level();
+	   		std::ostringstream strm_var;
+	   		strm_var << var_level;
+	   		string from = "_" + var + "_";
+	   		string to = ":" + strm_var.str() + ":";
+      	    size_t start_pos = 0;
+  		    while((start_pos = s_effect.find(from, start_pos)) != std::string::npos) {
+      		    	s_effect.replace(start_pos, from.length(), to);
+      		        start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+      		}
+      }
+	  outfile << s_effect << endl;
   }else{
 	  outfile << "no-run" << endl;
 	  outfile << "-" << endl;

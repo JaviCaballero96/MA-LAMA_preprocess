@@ -195,7 +195,8 @@ void generate_cpp_input(bool solveable_in_poly_time,
 			const CausalGraph &cg,
 			string name,
 			vector<Variable *> &shared_vars,
-			vector<int> &shared_vars_number) {
+			vector<int> &shared_vars_number,
+			vector<Variable *> variables) {
   ofstream outfile;
   string metric_str;
   string f_name = "output_prepro";
@@ -263,7 +264,7 @@ void generate_cpp_input(bool solveable_in_poly_time,
 
   outfile << operators.size() << endl;
   for(int i = 0; i < operators.size(); i++)
-    operators[i].generate_cpp_input(outfile);
+    operators[i].generate_cpp_input(outfile, variables);
 
   outfile << axioms.size() << endl;
   for(int i = 0; i < axioms.size(); i++)
