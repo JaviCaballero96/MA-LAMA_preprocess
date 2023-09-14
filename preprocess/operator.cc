@@ -175,13 +175,13 @@ void Operator::generate_cpp_input(ofstream &outfile, vector<Variable *> variable
 
     		string s_effect = pre_post[i].runtime_cost_effect;
     		string s_eff_aux = s_effect;
-    		while(s_effect.find("_") != string::npos){
+    		while(s_effect.find("!") != string::npos){
     			string var = "";
     			int i_var;
     			int var_level = 0;
-    			s_eff_aux = s_eff_aux.substr(s_eff_aux.find("_") + 1, s_eff_aux.length() - 1);
-    			var = s_eff_aux.substr(0, s_eff_aux.find("_"));
-    			s_eff_aux = s_eff_aux.substr(s_eff_aux.find("_") + 1, s_eff_aux.length() - 1);
+    			s_eff_aux = s_eff_aux.substr(s_eff_aux.find("!") + 1, s_eff_aux.length() - 1);
+    			var = s_eff_aux.substr(0, s_eff_aux.find("!"));
+    			s_eff_aux = s_eff_aux.substr(s_eff_aux.find("!") + 1, s_eff_aux.length() - 1);
     			stringstream strm(var);
     			strm >> i_var;
     			strm.str(std::string());
@@ -189,7 +189,7 @@ void Operator::generate_cpp_input(ofstream &outfile, vector<Variable *> variable
     			std::ostringstream strm_var;
     			strm_var << var_level;
 
-    			string from = "_" + var + "_";
+    			string from = "!" + var + "!";
     			string to = ":" + strm_var.str() + ":";
     		    size_t start_pos = 0;
     		    while((start_pos = s_effect.find(from, start_pos)) != std::string::npos) {
@@ -212,20 +212,20 @@ void Operator::generate_cpp_input(ofstream &outfile, vector<Variable *> variable
 	  outfile << "runtime" << endl;
 	  string s_effect = runtime_cost;
 	  string s_eff_aux = s_effect;
-	  while(s_effect.find("_") != string::npos){
+	  while(s_effect.find("!") != string::npos){
 	  		string var = "";
 	   		int i_var;
 	   		int var_level = 0;
-	  		s_eff_aux = s_eff_aux.substr(s_eff_aux.find("_") + 1, s_eff_aux.length() - 1);
-	   		var = s_eff_aux.substr(0, s_eff_aux.find("_"));
-	   		s_eff_aux = s_eff_aux.substr(s_eff_aux.find("_") + 1, s_eff_aux.length() - 1);
+	  		s_eff_aux = s_eff_aux.substr(s_eff_aux.find("!") + 1, s_eff_aux.length() - 1);
+	   		var = s_eff_aux.substr(0, s_eff_aux.find("!"));
+	   		s_eff_aux = s_eff_aux.substr(s_eff_aux.find("!") + 1, s_eff_aux.length() - 1);
 	   		stringstream strm(var);
 	   		strm >> i_var;
 	   		strm.str(std::string());
 	   		var_level = variables[i_var]->get_level();
 	   		std::ostringstream strm_var;
 	   		strm_var << var_level;
-	   		string from = "_" + var + "_";
+	   		string from = "!" + var + "!";
 	   		string to = ":" + strm_var.str() + ":";
       	    size_t start_pos = 0;
   		    while((start_pos = s_effect.find(from, start_pos)) != std::string::npos) {
