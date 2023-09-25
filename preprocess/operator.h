@@ -78,6 +78,7 @@ private:
   string name;
   vector<Prevail> prevail;      // var, val
   vector<PrePost> pre_post; // var, old-val, new-val
+  vector<PrePost> pre_block;
   float cost;
   bool have_runtime_cost;
   string runtime_cost;
@@ -92,6 +93,7 @@ public:
   string get_name() const {return name;}
   const vector<Prevail> &get_prevail() const {return prevail;}
   const vector<PrePost> &get_pre_post() const {return pre_post;}
+  const vector<PrePost> &get_pre_block() const {return pre_block;}
 };
 
 extern void strip_operators(vector<Operator> &operators);

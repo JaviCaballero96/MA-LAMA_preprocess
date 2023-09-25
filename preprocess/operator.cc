@@ -56,7 +56,14 @@ Operator::Operator(istream &in, const vector<Variable *> &variables) {
     string funcCost;
     float f_funcCost = 0;
     in >> varNo >> val;
-    if(val != -2 && (val != -3) && (val != -4) && (val != -5) && (val != -6))
+    if (val == -7 || val == -8){
+            in >> newVal;
+            if(eff_conds)
+              pre_block.push_back(PrePost(variables[varNo], ecs, val, newVal, float(-1)));
+            else
+              pre_block.push_back(PrePost(variables[varNo], val, newVal, float(-1)));
+    }
+    else if(val != -2 && (val != -3) && (val != -4) && (val != -5) && (val != -6))
     {
         in >> newVal;
         if(eff_conds)
@@ -206,6 +213,23 @@ void Operator::generate_cpp_input(ofstream &outfile, vector<Variable *> variable
     		    	<< pre_post[i].post << " " << pre_post[i].f_cost << endl;
     }
   }
+
+  outfile << pre_block.size() << endl;
+  for(int i = 0; i < pre_block.size(); i++) {
+	  assert(pre_block[i].var->get_level() != -1);
+	  if(pre_block[i].is_conditional_effect) {
+	    outfile << pre_block[i].effect_conds.size() << endl;
+	    for(int j = 0; j < pre_block[i].effect_conds.size(); j++)
+	    	outfile << pre_block[i].effect_conds[j].var->get_level() << " " <<
+			  pre_post[i].effect_conds[j].cond << endl;
+	  } else {
+	    outfile << "0" << endl;
+	  }
+
+	  outfile << pre_block[i].var->get_level() << " " << pre_block[i].pre << " "
+	  	    	<< pre_block[i].post << endl;
+  }
+
   outfile << cost << endl;
   if(have_runtime_cost)
   {
