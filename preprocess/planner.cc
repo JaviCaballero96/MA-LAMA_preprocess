@@ -64,6 +64,19 @@ int main(int argc, const char **argv) {
   fs >> name;
   if(name == "gen")
 	  name = "";
+  string filename(argv[1]);
+  string prefix = "";
+  string s_aux = "";
+  while(filename.find("/") != string::npos)
+  {
+	  filename = filename.substr(filename.find("/") + 1, filename.length());
+  }
+  s_aux = filename.substr(0, filename.find("_"));
+  if(s_aux != "output")
+  {
+	  cout << "suffix is " + filename + " --> " + s_aux << endl;
+	  prefix = s_aux;
+  }
 
   read_preprocessed_problem_description
     (fs, metric, internal_variables, variables, initial_state, goals, operators, axioms, shared_vars, shared_vars_number);
@@ -95,6 +108,6 @@ int main(int argc, const char **argv) {
   generate_cpp_input(solveable_in_poly_time, ordering, metric, initial_state, 
 		     goals, operators, axioms, successor_generator, 
 		     transition_graphs, causal_graph, name, shared_vars, shared_vars_number,
-			 variables);
+			 variables, prefix);
   cout << "done" << endl << endl;
 }

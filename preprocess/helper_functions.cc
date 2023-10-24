@@ -196,11 +196,14 @@ void generate_cpp_input(bool solveable_in_poly_time,
 			string name,
 			vector<Variable *> &shared_vars,
 			vector<int> &shared_vars_number,
-			vector<Variable *> variables) {
+			vector<Variable *> variables,
+			string prefix) {
   ofstream outfile;
   string metric_str;
   string f_name = "output_prepro";
   f_name = f_name + name;
+  if(prefix != "")
+	  f_name = prefix + "_" + f_name;
   outfile.open(f_name.c_str(),ios::out);
   if(name == "")
 	  outfile << "gen" << endl;

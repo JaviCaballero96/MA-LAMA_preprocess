@@ -82,6 +82,8 @@ void CausalGraph::weigh_graph_from_ops(const vector<Variable *> &,
     // For effect in pre_post -> the origin is target
     for(int k = 0; k < pre_post.size(); k++) {
       Variable *curr_target = pre_post[k].var;
+  	if (curr_target == NULL)
+  		printf("asdasa");
 
       // Conditions from conditional effects are also source vars for this target
       if(pre_post[k].is_conditional_effect)
@@ -91,6 +93,8 @@ void CausalGraph::weigh_graph_from_ops(const vector<Variable *> &,
       // For each source, get var and declare successors
       for(int j = 0; j < source_vars.size(); j++) {
 	Variable *curr_source = source_vars[j];
+	if (curr_source == NULL)
+		printf("asdasa");
 	WeightedSuccessors &weighted_succ = weighted_graph[curr_source];
 
 	// predecessor_graph is weighted_graph with edges turned around
