@@ -46,6 +46,7 @@ int main(int argc, const char **argv) {
   vector<Variable> internal_variables;
   State initial_state;
   vector<pair<Variable *, int> > goals;
+  vector<pair<pair<Variable*, int>, vector<pair<pair<Variable*, int>, double> > > > timed_goals;
   vector<Operator> operators;
   vector<Axiom> axioms;
   vector<DomainTransitionGraph> transition_graphs;
@@ -79,7 +80,7 @@ int main(int argc, const char **argv) {
   }
 
   read_preprocessed_problem_description
-    (fs, metric, internal_variables, variables, initial_state, goals, operators, axioms, shared_vars, shared_vars_number);
+    (fs, metric, internal_variables, variables, initial_state, goals, timed_goals, operators, axioms, shared_vars, shared_vars_number);
   //dump_preprocessed_problem_description
   //  (variables, initial_state, goals, operators, axioms);
   
@@ -106,7 +107,7 @@ int main(int argc, const char **argv) {
 
   cout << "Writing output..." << endl;
   generate_cpp_input(solveable_in_poly_time, ordering, metric, initial_state, 
-		     goals, operators, axioms, successor_generator, 
+		     goals, timed_goals, operators, axioms, successor_generator,
 		     transition_graphs, causal_graph, name, shared_vars, shared_vars_number,
 			 variables, prefix);
   cout << "done" << endl << endl;

@@ -45,6 +45,9 @@ clean:
 	rm -f $(OBJECTS:%=obj/%) $(PROFILE_OBJECTS:%=obj/%) *~
 	rm -f Makefile.depend $(PROFILE_TARGET) gmon.out
 
+distclean: clean
+	rm -f $(TARGET) PROFILE
+
 veryclean: clean
 	rm -f $(TARGET) PROFILE
 
