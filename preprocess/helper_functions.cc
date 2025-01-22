@@ -104,6 +104,29 @@ void read_goal(istream &in, const vector<Variable *> &variables,
   check_magic(in, "end_goal");
 }
 
+void read_timed_goal(istream &in, const vector<Variable *> &variables,
+	       vector<pair<pair<Variable*, int>, vector<pair<pair<Variable*, int>, double> > > > &timed_goals) {
+  check_magic(in, "begin_timed_goal");
+  int count;
+  in >> count;
+  for(int i = 0; i < count; i++) {
+    int varNo, val;
+    in >> varNo >> val;
+    //vector<pair<pair<Variable*, int>, double> > empty_vector = vector<pair<pair<Variable*, int>, double> >();
+    timed_goals.push_back(make_pair(make_pair(variables[varNo], val), vector<pair<pair<Variable*, int>, double> >()));
+    int n_timed_facts = 0;
+    in >> n_timed_facts;
+    for(int i = 0; i < n_timed_facts; i++){
+    	int fvar, fval;
+    	double ftime;
+    	in >> fvar >> fval >> ftime;
+    	timed_goals.back().second.push_back(make_pair(make_pair(variables[fvar], fval), ftime));
+    }
+    //timed_goals.push_back(make_pair(variables[varNo], val));
+  }
+  check_magic(in, "end_timed_goal");
+}
+
 void dump_goal(const vector<pair<Variable*, int> > &goals) {
   cout << "Goal Conditions:" << endl;
   for(int i = 0; i < goals.size(); i++)
@@ -133,6 +156,7 @@ void read_preprocessed_problem_description(istream &in,
 					   vector<Variable *> &variables, 
 					   State &initial_state,
 					   vector<pair<Variable*, int> > &goals,
+					   vector<pair<pair<Variable*, int>, vector<pair<pair<Variable*, int>, double > > > > &timed_goals,
 					   vector<Operator> &operators,
 					   vector<Axiom> &axioms,
 					   vector<Variable *> &shared_vars,
@@ -142,6 +166,7 @@ void read_preprocessed_problem_description(istream &in,
   initial_state = State(in, variables);
   read_shared(in, shared_vars, shared_vars_number, variables);
   read_goal(in, variables, goals);
+  read_timed_goal(in, variables, timed_goals);
   read_operators(in, variables, operators);
   read_axioms(in, variables, axioms);
 }
@@ -188,6 +213,7 @@ void generate_cpp_input(bool solveable_in_poly_time,
 			const string &metric,
 			const State &initial_state,
 			const vector<pair<Variable*, int> > &goals,
+			const vector<pair<pair<Variable*, int>, vector<pair<pair<Variable*, int>, double> > > > &timed_goals,
 			const vector<Operator> & operators,
 			const vector<Axiom> &axioms,
 			const SuccessorGenerator &sg,
@@ -264,6 +290,41 @@ void generate_cpp_input(bool solveable_in_poly_time,
     if(ordered_goal_values[i] != -1)
       outfile << i << " " << ordered_goal_values[i] << endl;
   outfile << "end_goal" << endl;
+
+
+
+
+  outfile << "begin_timed_goals" << endl;
+  outfile << timed_goals.size() << endl;
+  for(int i = 0; i < timed_goals.size(); i++){
+
+	  for(int j = 0; j < var_count; j++){
+		  if(ordered_goal_values[j] != -1 &&
+				  j == timed_goals[i].first.first->get_level())
+			  outfile << j << " " << ordered_goal_values[j] << endl;
+	  }
+
+	  outfile << timed_goals[i].second.size() << endl;
+
+	  vector<int> ordered_timed_facts;
+	  ordered_timed_facts.resize(var_count, -4);
+	  vector<double> ordered_timed_facts_time;
+	  ordered_timed_facts_time.resize(var_count, -1);
+
+	  for(int j = 0; j < timed_goals[i].second.size(); j++) {
+	      int var_index = timed_goals[i].second[j].first.first->get_level();
+	      ordered_timed_facts[var_index] = timed_goals[i].second[j].first.second;
+	      ordered_timed_facts_time[var_index] = timed_goals[i].second[j].second;
+	  }
+
+	  for(int j = 0; j < var_count; j++){
+		  if(ordered_timed_facts[j] != -4)
+			  outfile << j << " " << ordered_timed_facts[j] << " " << ordered_timed_facts_time[j] << endl;
+	  }
+  }
+  outfile << "end_timed_goals" << endl;
+
+
 
   outfile << operators.size() << endl;
   for(int i = 0; i < operators.size(); i++)
