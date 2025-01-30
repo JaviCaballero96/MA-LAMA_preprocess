@@ -315,12 +315,15 @@ void generate_cpp_input(bool solveable_in_poly_time,
 	      int var_index = timed_goals[i].second[j].first.first->get_level();
 	      ordered_timed_facts[var_index] = timed_goals[i].second[j].first.second;
 	      ordered_timed_facts_time[var_index] = timed_goals[i].second[j].second;
+
+	      outfile << var_index << " " << timed_goals[i].second[j].first.second <<
+	    		  " " << timed_goals[i].second[j].second << endl;
 	  }
 
-	  for(int j = 0; j < var_count; j++){
+	  /* for(int j = 0; j < var_count; j++) {
 		  if(ordered_timed_facts[j] != -4)
 			  outfile << j << " " << ordered_timed_facts[j] << " " << ordered_timed_facts_time[j] << endl;
-	  }
+	  } */
   }
   outfile << "end_timed_goals" << endl;
 
