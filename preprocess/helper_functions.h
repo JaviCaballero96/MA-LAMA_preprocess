@@ -53,7 +53,8 @@ void read_preprocessed_problem_description(istream &in,
 					   vector<Operator> &operators,
 					   vector<Axiom> &axioms,
 					   vector<Variable *> &shared_vars,
-					   vector<int> &shared_vars_number);
+					   vector<int> &shared_vars_number,
+					   vector<pair<string, vector<pair<string, vector<pair<string, string> > > > > > &modules);
 
 //void dump_everything
 void dump_preprocessed_problem_description(const vector<Variable *> &variables, 
@@ -70,6 +71,7 @@ void generate_cpp_input(bool causal_graph_acyclic,
 			const State &initial_state,
 			const vector<pair<Variable*, int> > &goals,
 			const vector<pair<pair<Variable*, int>, vector<pair<pair<Variable*, int>, double> > > > &timed_goals,
+			const vector<pair<string, vector<pair<string, vector<pair<string, string> > > > > > modules,
 			const vector<Operator> & operators,
 			const vector<Axiom> &axioms,
 			const SuccessorGenerator &sg,

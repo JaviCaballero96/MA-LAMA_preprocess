@@ -127,6 +127,33 @@ void read_timed_goal(istream &in, const vector<Variable *> &variables,
   check_magic(in, "end_timed_goal");
 }
 
+void read_modules(istream &in, vector<pair<string, vector<pair<string, vector<pair<string, string> > > > > > &modules) {
+	  check_magic(in, "begin_modules");
+	  int m_count;
+	  in >> m_count;
+	  for(int i = 0; i < m_count; i++) {
+		  string m_name;
+		  in >> m_name;
+		  modules.push_back(make_pair(m_name, vector<pair<string, vector<pair<string, string> > > >()));
+		  modules.back().first = m_name;
+		  int f_count;
+		  in >> f_count;
+		  for(int j = 0; j < f_count; j++) {
+			  string f_name;
+			  in >> f_name;
+			  modules.back().second.push_back(make_pair(f_name, vector<pair<string, string> >()));
+			  int arg_count;
+			  in >> arg_count;
+			  for(int z = 0; z < arg_count; z++) {
+				  string arg_name, arg_type;
+				  in >> arg_name >> arg_type;
+				  modules.back().second.back().second.push_back(make_pair(arg_name, arg_type));
+			  }
+		  }
+	  }
+	  check_magic(in, "end_modules");
+}
+
 void dump_goal(const vector<pair<Variable*, int> > &goals) {
   cout << "Goal Conditions:" << endl;
   for(int i = 0; i < goals.size(); i++)
@@ -160,13 +187,15 @@ void read_preprocessed_problem_description(istream &in,
 					   vector<Operator> &operators,
 					   vector<Axiom> &axioms,
 					   vector<Variable *> &shared_vars,
-					   vector<int> &shared_vars_number) {
+					   vector<int> &shared_vars_number,
+					   vector<pair<string, vector<pair<string, vector<pair<string, string> > > > > > &modules) {
   read_metric(in, metric); 
   read_variables(in, internal_variables, variables);
   initial_state = State(in, variables);
   read_shared(in, shared_vars, shared_vars_number, variables);
   read_goal(in, variables, goals);
   read_timed_goal(in, variables, timed_goals);
+  read_modules(in, modules);
   read_operators(in, variables, operators);
   read_axioms(in, variables, axioms);
 }
@@ -214,6 +243,7 @@ void generate_cpp_input(bool solveable_in_poly_time,
 			const State &initial_state,
 			const vector<pair<Variable*, int> > &goals,
 			const vector<pair<pair<Variable*, int>, vector<pair<pair<Variable*, int>, double> > > > &timed_goals,
+			const vector<pair<string, vector<pair<string, vector<pair<string, string> > > > > > modules,
 			const vector<Operator> & operators,
 			const vector<Axiom> &axioms,
 			const SuccessorGenerator &sg,
@@ -291,9 +321,6 @@ void generate_cpp_input(bool solveable_in_poly_time,
       outfile << i << " " << ordered_goal_values[i] << endl;
   outfile << "end_goal" << endl;
 
-
-
-
   outfile << "begin_timed_goals" << endl;
   outfile << timed_goals.size() << endl;
   for(int i = 0; i < timed_goals.size(); i++){
@@ -328,7 +355,20 @@ void generate_cpp_input(bool solveable_in_poly_time,
   }
   outfile << "end_timed_goals" << endl;
 
-
+  outfile << "begin_modules" << endl;
+  outfile << modules.size() << endl;
+  for(int i = 0; i < modules.size(); i++) {
+	  outfile << modules[i].first << endl;
+	  outfile << modules[i].second.size() << endl;
+	  for(int j = 0; j < modules[i].second.size(); j++) {
+		  outfile << modules[i].second[j].first << endl;
+		  outfile << modules[i].second[j].second.size() << endl;
+		  for(int z = 0; z < modules[i].second[j].second.size(); z++) {
+			  outfile << modules[i].second[j].second[z].first << " " << modules[i].second[j].second[z].second << endl;
+		  }
+	  }
+  }
+  outfile << "end_modules" << endl;
 
   outfile << operators.size() << endl;
   for(int i = 0; i < operators.size(); i++)
