@@ -97,8 +97,13 @@ Operator::Operator(istream &in, const vector<Variable *> &variables) {
   if(s_aux == "runtime"){
 	  have_runtime_cost = true;
 	  in >> runtime_cost;
-  } else{
+  } else if (s_aux == "modulefunc"){
+	  have_module_cost = true;
+	  in >> runtime_cost;
+	  cout << name << endl;
+  } else {
 	  have_runtime_cost = false;
+	  have_module_cost = false;
 	  in >> s_aux;
   }
   check_magic(in, "end_operator");
@@ -258,7 +263,11 @@ void Operator::generate_cpp_input(ofstream &outfile, vector<Variable *> variable
       		}
       }
 	  outfile << s_effect << endl;
-  }else{
+  }else if (have_module_cost){
+	  outfile << "modulefunc" << endl;
+	  outfile << this->runtime_cost << endl;
+  }
+  else {
 	  outfile << "no-run" << endl;
 	  outfile << "-" << endl;
   }

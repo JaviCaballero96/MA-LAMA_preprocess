@@ -81,6 +81,7 @@ private:
   vector<PrePost> pre_block;
   float cost;
   bool have_runtime_cost;
+  bool have_module_cost;
   string runtime_cost;
 public:
   Operator(istream &in, const vector<Variable *> &variables);
